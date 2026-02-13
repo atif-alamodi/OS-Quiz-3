@@ -82,4 +82,141 @@ const questions = [
     explanation: "الحاسب يقوم بالإدخال والمعالجة والتخزين (وغالبًا الإخراج أيضًا)."
   },
   {
-    question: "13) ما المقصود بالخوارزم
+    question: "13) ما المقصود بالخوارزمية؟",
+    answers: ["لغة برمجة", "جهاز حاسب", "سلسلة خطوات لحل مشكلة", "برنامج جاهز"],
+    correct: 2,
+    explanation: "الخوارزمية خطوات مرتبة لحل مشكلة."
+  },
+  {
+    question: "14) أي من التالي يُعد من المكونات الأساسية للبرامج؟",
+    answers: ["الشرط", "التكرار", "المدخلات والمخرجات", "جميع ما سبق"],
+    correct: 3,
+    explanation: "الشرط والتكرار والمدخلات/المخرجات كلها عناصر أساسية."
+  },
+  {
+    question: "15) من أسباب اختيار لغة بايثون:",
+    answers: ["صعوبة تعلمها", "قلة استخدامها", "بساطة قواعدها", "تعمل على نظام واحد"],
+    correct: 2,
+    explanation: "بايثون مشهورة ببساطة قواعدها وسهولة تعلمها."
+  },
+  {
+    question: "16) تعمل لغة بايثون على أنظمة التشغيل:",
+    answers: ["ويندوز فقط", "لينكس فقط", "ماك فقط", "جميع أنظمة التشغيل"],
+    correct: 3,
+    explanation: "بايثون تعمل على Windows وLinux وmacOS وغيرها."
+  },
+  {
+    question: "17) من أشهر الشركات التي تستخدم بايثون:",
+    answers: ["Google", "NASA", "Microsoft", "جميع ما سبق"],
+    correct: 3,
+    explanation: "عدة شركات/جهات كبيرة تستخدم بايثون، ومنها المذكور."
+  }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const resultEl = document.getElementById("result");
+const nextBtn = document.getElementById("nextBtn");
+
+function loadQuestion() {
+  answered = false;
+  nextBtn.disabled = true;
+  answersEl.innerHTML = "";
+
+  const q = questions[currentQuestion];
+  questionEl.innerText = q.question;
+
+  // قبل الإجابة: عرض الدرجة الحالية (اختياري)
+  resultEl.innerHTML = `
+    <div style="text-align:right;">
+      <strong>الدرجة:</strong> ${score} / ${questions.length}
+    </div>
+    <div style="text-align:right; margin-top:6px;">
+      اختر إجابة لعرض التصحيح.
+    </div>
+  `;
+
+  q.answers.forEach((answer, index) => {
+    const btn = document.createElement("button");
+    btn.innerText = answer;
+    btn.classList.add("answer-btn");
+    btn.onclick = () => checkAnswer(index);
+    answersEl.appendChild(btn);
+  });
+}
+
+function checkAnswer(selectedIndex) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[currentQuestion];
+  const correctIndex = q.correct;
+
+  const buttons = document.querySelectorAll(".answer-btn");
+  buttons.forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === correctIndex) btn.classList.add("correct");
+    if (idx === selectedIndex && selectedIndex !== correctIndex) btn.classList.add("wrong");
+  });
+
+  const isCorrect = selectedIndex === correctIndex;
+  if (isCorrect) score++;
+
+  // ✅ المطلوب: الدرجة أولًا عند التصحيح
+  resultEl.innerHTML = `
+    <div style="text-align:right; line-height:1.9;">
+      <div style="font-size:18px; margin-bottom:8px;">
+        <strong>الدرجة:</strong> ${score} / ${questions.length}
+      </div>
+      <div style="margin-bottom:6px;">
+        ${isCorrect ? "إجابة صحيحة ✅" : "إجابة خاطئة ❌"}
+      </div>
+      <div><strong>الإجابة الصحيحة:</strong> ${q.answers[correctIndex]}</div>
+      <div style="margin-top:6px;"><strong>الشرح:</strong> ${q.explanation}</div>
+    </div>
+  `;
+
+  nextBtn.disabled = false;
+}
+
+nextBtn.onclick = () => {
+  currentQuestion++;
+  if (currentQuestion < questions.length) {
+    loadQuestion();
+  } else {
+    showFinalResult();
+  }
+};
+
+function showFinalResult() {
+  questionEl.innerText = "انتهى الاختبار 🎉";
+  answersEl.innerHTML = "";
+  nextBtn.style.display = "none";
+
+  const percent = Math.round((score / questions.length) * 100);
+
+  resultEl.innerHTML = `
+    <div style="text-align:center; line-height:2;">
+      <h2>الدرجة النهائية</h2>
+      <h1>${score} / ${questions.length}</h1>
+      <h3>${percent}%</h3>
+      <button id="restartBtn"
+        style="background:#16a34a; color:#fff; padding:10px 16px; border-radius:8px; border:none; cursor:pointer;">
+        إعادة الاختبار
+      </button>
+    </div>
+  `;
+
+  document.getElementById("restartBtn").onclick = () => {
+    currentQuestion = 0;
+    score = 0;
+    nextBtn.style.display = "inline-block";
+    loadQuestion();
+  };
+}
+
+loadQuestion();
