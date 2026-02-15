@@ -1,2 +1,2 @@
-# OS-Quiz-3
+# Python-Quiz
 Quiz3of OS
