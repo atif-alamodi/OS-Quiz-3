@@ -1,2 +1,2 @@
 # Stat-Quiz
-Quiz3of OS
+Quiz3of stat
